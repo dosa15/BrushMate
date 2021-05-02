@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1093</width>
-    <height>896</height>
+    <width>802</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,23 @@
        <property name="icon">
         <iconset>
          <normaloff>assets/mouse.png</normaloff>assets/mouse.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="freehandButton">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>assets/freehand.jpeg</normaloff>assets/freehand.jpeg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -82,13 +99,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="freehandButton">
+      <widget class="QPushButton" name="insertimgButton">
        <property name="text">
         <string/>
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>assets/freehand.jpeg</normaloff>assets/freehand.jpeg</iconset>
+         <normaloff>assets/insert image icon.png</normaloff>assets/insert image icon.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -99,13 +116,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="insertimgButton">
+      <widget class="QPushButton" name="stampButton">
        <property name="text">
         <string/>
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>assets/insert image icon.png</normaloff>assets/insert image icon.png</iconset>
+         <normaloff>assets/stamp.jpg</normaloff>assets/stamp.jpg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -134,7 +151,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>0</y>
+      <y>-20</y>
       <width>801</width>
       <height>79</height>
      </rect>
@@ -262,7 +279,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1093</width>
+     <width>802</width>
      <height>26</height>
     </rect>
    </property>
