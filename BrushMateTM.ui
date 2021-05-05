@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1124</width>
-    <height>914</height>
+    <width>945</width>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -279,23 +279,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="paintbucketButton_2">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>assets/paintbucket.jpg</normaloff>assets/paintbucket.jpg</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>30</width>
-         <height>30</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -316,8 +299,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1124</width>
-     <height>26</height>
+     <width>945</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
