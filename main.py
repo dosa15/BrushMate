@@ -11,6 +11,8 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.scene = QtWidgets.QGraphicsScene()
         self.graphicsView.setScene(self.scene)
+        brush = QtGui.QBrush(QtCore.Qt.white)
+        self.scene.setBackgroundBrush(QtBrush=brush, QColor=QtCore.Qt.white)
         # self.pen = QtGui.QPen(QtCore.Qt.green)
         # self.scene.addRect(QtCore.QRectF(0, 0, 100, 200), QtGui.QPen(QtCore.Qt.blue), QtGui.QBrush(QtCore.Qt.green))
     
@@ -30,6 +32,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     #     for i in range(1000):
     #         x = random.randint(1, size.width() - 1)
     #         y = random.randint(1, size.height() - 1)
+    def paintEvent(self, event):
+        painter = QPainter()
+        painter.setPen(QtGui.QPen(Qt.green,  8, Qt.DashLine))
+        painter.drawEllipse(40, 40, 400, 400)
+        # return super().paintEvent(self, QPaintEvent)
     
 
 

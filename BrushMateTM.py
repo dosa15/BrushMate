@@ -139,7 +139,7 @@ class Ui_MainWindow(object):
         self.toolBar.addItem(spacerItem2)
         self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
         self.graphicsView.setGeometry(QtCore.QRect(100, 90, 661, 681))
-        brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         self.graphicsView.setBackgroundBrush(brush)
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
