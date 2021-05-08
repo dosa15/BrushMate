@@ -17,11 +17,11 @@ class GraphicsScene(QGraphicsScene):
 
     def mousePressEvent(self, event):
         if self.firstClick:
-            self.start = event.pos()
+            self.start = event.scenePos()
             print("Start:", self.start)
             self.firstClick = False
         else:
-            self.end = event.pos()
+            self.end = event.scenePos()
             print("End:", self.end)
             drawSomething = QGraphicsLineItem(QLineF(self.start, self.end))
             drawSomething.setPen(self.pen)
