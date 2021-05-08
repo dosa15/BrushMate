@@ -379,11 +379,6 @@
      <string>View</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuImage">
-    <property name="title">
-     <string>Image</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuLayer">
     <property name="title">
      <string>Layer</string>
@@ -399,7 +394,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuImage"/>
    <addaction name="menuLayer"/>
    <addaction name="menuHelp"/>
   </widget>
