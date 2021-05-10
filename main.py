@@ -5,6 +5,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import sys, random
 
+freeHand = False
+freeHandDraw = False
 drawingLines = False
 drawingRects = False
 drawingCircles = False
@@ -18,21 +20,27 @@ class GraphicsScene(QGraphicsScene):
         self.firstClickRect = True
         self.firstClickCircle = True
         self.start = self.end = QPointF(-1, -1)
-        print(parent)
+        self.pen = QPen(Qt.black)
 
     def mousePressEvent(self, event):        
-        global drawingLines, drawingRects, drawingCircles
+        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles
+        
+        if freeHand:
+            freeHandDraw = True
+            self.start = event.scenePos()
+
         if drawingLines:
-            self.pen = QPen(Qt.black)
             if self.firstClickLine:
                 self.start = event.scenePos()
                 self.firstClickLine = False
             else:
                 self.end = event.scenePos()
-                drawSomething = QGraphicsLineItem(QLineF(self.start, self.end))
-                drawSomething.setPen(self.pen)
-                self.addItem(drawSomething)
+                self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
                 self.firstClickLine = True
+
+        # if drawingRects:
+
+        # if drawingCircles:
                 
         else:
             self.firstClickLine = True
@@ -40,12 +48,19 @@ class GraphicsScene(QGraphicsScene):
             self.firstClickCircle = True
 
 
-    # def mouseMoveEvent(self, event):
-    #     self.cursorCurrentPosition = event.scenePos()
-    #     current = QtCore.QPointF(self.cursorCurrentPosition.x(),self.cursorCurrentPosition.y())
-    #     link = QtGui.QGraphicsLineItem(QtCore.QLineF(self.start, current))
-    #     link.setPen(self.pen)
-    #     self.scene.addItem(link)
+    def mouseMoveEvent(self, event):
+        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles
+
+        if freeHandDraw:
+            self.end = event.scenePos()
+            self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
+            self.start = self.end
+    
+    def mouseReleaseEvent(self, event):
+        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles
+        
+        if freeHandDraw:
+            freeHandDraw = False
 
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -56,7 +71,41 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.scene = GraphicsScene(self)
         self.graphicsView.setScene(self.scene)
         self.graphicsView.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.mouseButton.setChecked(True)
+        self.mouseButton.clicked.connect(self.mouseClicked)
+        self.freehandButton.clicked.connect(self.freehandClicked)
+        self.eraserButton.clicked.connect(self.eraserClicked)
         self.assignShapesMenu()
+        self.insertImgButton.clicked.connect(self.insertImgClicked)
+        self.insertTextButton.clicked.connect(self.insertTextClicked)
+        self.cloneStampButton.clicked.connect(self.cloneStampClicked)
+        self.floodfillButton.clicked.connect(self.floodfillClicked)
+
+
+    def mouseClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.mouseButton.setChecked(True)
+        freeHand = drawingLines = drawingRects = drawingCircles = False
+
+
+    def freehandClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.freehandButton.setChecked(True)
+        drawingLines = drawingRects = drawingCircles = False
+
+        if freeHand:
+            freeHand = False
+        else:
+            freeHand = True
+
+
+    def eraserClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.eraserButton.setChecked(True)
+        freeHand = drawingLines = drawingRects = drawingCircles = False
 
 
     def assignShapesMenu(self):
@@ -67,7 +116,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot(QtWidgets.QAction)
     def shapesClicked(self, action):
-        global drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.shapesButton.setChecked(True)
+        freeHand = False
+        
         if not action.text():
             drawingLines = drawingRects = drawingCircles = False
         elif action.text() == "Line":
@@ -82,6 +135,45 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             drawingLines = False
             drawingRects = False
             drawingCircles = True
+
+
+    def insertImgClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.insertImgButton.setChecked(True)
+        freeHand = drawingLines = drawingRects = drawingCircles = False
+
+
+    def insertTextClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.insertTextButton.setChecked(True)
+        freeHand = drawingLines = drawingRects = drawingCircles = False
+
+
+    def cloneStampClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.cloneStampButton.setChecked(True)
+        freeHand = drawingLines = drawingRects = drawingCircles = False
+
+
+    def floodfillClicked(self):
+        global freeHand, drawingLines, drawingRects, drawingCircles
+        self.uncheckAllButtons()
+        self.floodfillButton.setChecked(True)
+        freeHand = drawingLines = drawingRects = drawingCircles = False
+
+
+    def uncheckAllButtons(self):
+        self.mouseButton.setChecked(False)
+        self.freehandButton.setChecked(False)
+        self.eraserButton.setChecked(False)
+        self.shapesButton.setChecked(False)
+        self.insertImgButton.setChecked(False)
+        self.insertTextButton.setChecked(False)
+        self.cloneStampButton.setChecked(False)
+        self.floodfillButton.setChecked(False)
         
 
 if __name__ == '__main__':
