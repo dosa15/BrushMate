@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(785, 831)
+        MainWindow.resize(771, 804)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setEnabled(True)
         self.centralwidget.setAutoFillBackground(False)
@@ -149,7 +149,7 @@ class Ui_MainWindow(object):
         self.graphicsView.setObjectName("graphicsView")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 785, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 771, 22))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -205,8 +205,8 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionSearch_in_BrushMate)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
-        self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuLayer.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)

@@ -6,31 +6,39 @@ from PyQt5.QtWidgets import *
 import sys, random
 
 drawingLines = False
+drawingRects = False
+drawingCircles = False
 
 class GraphicsScene(QGraphicsScene):
     
     def __init__(self, parent=None):
         QGraphicsScene.__init__(self, parent)
-        
-        global drawingLines
-        
         self.setSceneRect(0, 0, 660, 680)
-        self.firstClick = True
-        self.start = self.end = QPointF(0, 0)
+        self.firstClickLine = True
+        self.firstClickRect = True
+        self.firstClickCircle = True
+        self.start = self.end = QPointF(-1, -1)
         print(parent)
 
     def mousePressEvent(self, event):        
-        # if drawingLines:
-        self.pen = QPen(Qt.black)
-        if self.firstClick:
-            self.start = event.scenePos()
-            self.firstClick = False
+        global drawingLines, drawingRects, drawingCircles
+        if drawingLines:
+            self.pen = QPen(Qt.black)
+            if self.firstClickLine:
+                self.start = event.scenePos()
+                self.firstClickLine = False
+            else:
+                self.end = event.scenePos()
+                drawSomething = QGraphicsLineItem(QLineF(self.start, self.end))
+                drawSomething.setPen(self.pen)
+                self.addItem(drawSomething)
+                self.firstClickLine = True
+                
         else:
-            self.end = event.scenePos()
-            drawSomething = QGraphicsLineItem(QLineF(self.start, self.end))
-            drawSomething.setPen(self.pen)
-            self.addItem(drawSomething)
-            self.firstClick = True
+            self.firstClickLine = True
+            self.firstClickRect = True
+            self.firstClickCircle = True
+
 
     # def mouseMoveEvent(self, event):
     #     self.cursorCurrentPosition = event.scenePos()
@@ -45,21 +53,36 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(BrushMateWindow, self).__init__(parent)
         self.setupUi(self)
-        
-        global drawingLines
-        
         self.scene = GraphicsScene(self)
         self.graphicsView.setScene(self.scene)
         self.graphicsView.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.assignShapesMenu()
 
-        # If the 'shapes' Button is pressed, enable drawing lines, else disable drawing lines
-        if self.shapesButton.isFlat():
-            self.shapesButton.setFlat(True)
+
+    def assignShapesMenu(self):
+        menu = QMenu(self.shapesButton, triggered=self.shapesClicked)
+        for opt in ["", "Line", "Rectangle", "Circle"]:
+            menu.addAction(opt)
+        self.shapesButton.setMenu(menu)
+    
+    @QtCore.pyqtSlot(QtWidgets.QAction)
+    def shapesClicked(self, action):
+        global drawingLines, drawingRects, drawingCircles
+        if not action.text():
+            drawingLines = drawingRects = drawingCircles = False
+        elif action.text() == "Line":
             drawingLines = True
-        else:
-            self.shapesButton.setFlat(False)
+            drawingRects = False
+            drawingCircles = False
+        elif action.text() == "Rectangle":
             drawingLines = False
-
+            drawingRects = True
+            drawingCircles = False
+        elif action.text() == "Circle":
+            drawingLines = False
+            drawingRects = False
+            drawingCircles = True
+        
 
 if __name__ == '__main__':
     import sys
