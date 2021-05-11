@@ -10,20 +10,25 @@ freeHandDraw = False
 drawingLines = False
 drawingRects = False
 drawingCircles = False
+drawingEllipses = False
 
 class GraphicsScene(QGraphicsScene):
 
     def __init__(self, parent=None):
         QGraphicsScene.__init__(self, parent)
         self.setSceneRect(0, 0, 660, 680)
-        self.firstClickLine = True
-        self.firstClickRect = True
-        self.firstClickCircle = True
+        self.setAllFirstClicksTrue()
         self.start = self.end = QPointF(-1, -1)
         self.pen = QPen(Qt.black)
 
+    def setAllFirstClicksTrue(self):
+        self.firstClickLine = True
+        self.firstClickRect = True
+        self.firstClickCircle = True
+        self.firstClickEllipse = True
+
     def mousePressEvent(self, event):
-        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles
+        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles, drawingEllipses
 
         if freeHand:
             freeHandDraw = True
@@ -51,12 +56,23 @@ class GraphicsScene(QGraphicsScene):
                 self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickRect = True
 
-        # if drawingCircles:
+        # elif drawingCircles:
+
+        elif drawingEllipses:
+            if self.firstClickEllipse:
+                self.start = event.scenePos()
+                self.firstClickEllipse = False
+            else:
+                self.end = event.scenePos()
+                if(self.start.x()>self.end.x()):
+                    self.start.x,self.end.x=self.end.x,self.start.x
+                if(self.start.y()>self.end.y()):
+                    self.start.y,self.end.y=self.end.y,self.start.y
+                self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.firstClickEllipse = True
 
         else:
-            self.firstClickLine = True
-            self.firstClickRect = True
-            self.firstClickCircle = True
+            self.setAllFirstClicksTrue()
 
 
     def mouseMoveEvent(self, event):
@@ -97,14 +113,14 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         global freeHand, drawingLines, drawingRects, drawingCircles
         self.uncheckAllButtons()
         self.mouseButton.setChecked(True)
-        freeHand = drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
 
     def freehandClicked(self):
         global freeHand, drawingLines, drawingRects, drawingCircles
         self.uncheckAllButtons()
         self.freehandButton.setChecked(True)
-        drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
         if freeHand:
             freeHand = False
@@ -113,67 +129,61 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
     def eraserClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
-        freeHand = drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
 
     def assignShapesMenu(self):
         menu = QMenu(self.shapesButton, triggered=self.shapesClicked)
-        for opt in ["", "Line", "Rectangle", "Circle"]:
+        for opt in ["", "Line", "Rectangle", "Circle", "Ellipse"]:
             menu.addAction(opt)
         self.shapesButton.setMenu(menu)
 
     @QtCore.pyqtSlot(QtWidgets.QAction)
     def shapesClicked(self, action):
-        global freeHand, drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.shapesButton.setChecked(True)
-        freeHand = False
 
-        if not action.text():
-            drawingLines = drawingRects = drawingCircles = False
-        elif action.text() == "Line":
+        self.setallFalse()
+        if action.text() == "Line":
             drawingLines = True
-            drawingRects = False
-            drawingCircles = False
         elif action.text() == "Rectangle":
-            drawingLines = False
             drawingRects = True
-            drawingCircles = False
         elif action.text() == "Circle":
-            drawingLines = False
-            drawingRects = False
             drawingCircles = True
+        elif action.text() == "Ellipse":
+            drawingEllipses = True
 
 
     def insertImgClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
-        freeHand = drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
 
     def insertTextClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
-        freeHand = drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
 
     def cloneStampClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.cloneStampButton.setChecked(True)
-        freeHand = drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
 
     def floodfillClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingCircles
+        global freeHand, drawingLines, drawingRects, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
-        freeHand = drawingLines = drawingRects = drawingCircles = False
+        self.setallFalse()
 
 
     def uncheckAllButtons(self):
@@ -185,6 +195,9 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.setChecked(False)
         self.cloneStampButton.setChecked(False)
         self.floodfillButton.setChecked(False)
+
+    def setallFalse(self):
+        freeHand = drawingLines = drawingRects = drawingCircles = drawingEllipses = False
 
 
 if __name__ == '__main__':
