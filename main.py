@@ -12,7 +12,7 @@ drawingRects = False
 drawingCircles = False
 
 class GraphicsScene(QGraphicsScene):
-    
+
     def __init__(self, parent=None):
         QGraphicsScene.__init__(self, parent)
         self.setSceneRect(0, 0, 660, 680)
@@ -22,9 +22,9 @@ class GraphicsScene(QGraphicsScene):
         self.start = self.end = QPointF(-1, -1)
         self.pen = QPen(Qt.black)
 
-    def mousePressEvent(self, event):        
+    def mousePressEvent(self, event):
         global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles
-        
+
         if freeHand:
             freeHandDraw = True
             self.start = event.scenePos()
@@ -38,10 +38,20 @@ class GraphicsScene(QGraphicsScene):
                 self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
                 self.firstClickLine = True
 
-        # if drawingRects:
-
+        if drawingRects:
+            if self.firstClickRect:
+                self.start = event.scenePos()
+                self.firstClickRect = False
+            else:
+                self.end = event.scenePos()
+                if(self.start.x()>self.end.x()):
+                    self.start.x,self.end.x=self.end.x,self.start.x
+                if(self.start.y()>self.end.y()):
+                    self.start.y,self.end.y=self.end.y,self.start.y
+                self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.firstClickRect = True
         # if drawingCircles:
-                
+
         else:
             self.firstClickLine = True
             self.firstClickRect = True
@@ -55,10 +65,10 @@ class GraphicsScene(QGraphicsScene):
             self.end = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
             self.start = self.end
-    
+
     def mouseReleaseEvent(self, event):
         global freeHand, freeHandDraw, drawingLines, drawingRects, drawingCircles
-        
+
         if freeHandDraw:
             freeHandDraw = False
 
@@ -113,14 +123,14 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for opt in ["", "Line", "Rectangle", "Circle"]:
             menu.addAction(opt)
         self.shapesButton.setMenu(menu)
-    
+
     @QtCore.pyqtSlot(QtWidgets.QAction)
     def shapesClicked(self, action):
         global freeHand, drawingLines, drawingRects, drawingCircles
         self.uncheckAllButtons()
         self.shapesButton.setChecked(True)
         freeHand = False
-        
+
         if not action.text():
             drawingLines = drawingRects = drawingCircles = False
         elif action.text() == "Line":
@@ -174,7 +184,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.setChecked(False)
         self.cloneStampButton.setChecked(False)
         self.floodfillButton.setChecked(False)
-        
+
 
 if __name__ == '__main__':
     import sys
@@ -182,4 +192,3 @@ if __name__ == '__main__':
     w = BrushMateWindow()
     w.show()
     sys.exit(app.exec_())
-
