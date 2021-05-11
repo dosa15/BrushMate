@@ -29,7 +29,7 @@ class GraphicsScene(QGraphicsScene):
             freeHandDraw = True
             self.start = event.scenePos()
 
-        if drawingLines:
+        elif drawingLines:
             if self.firstClickLine:
                 self.start = event.scenePos()
                 self.firstClickLine = False
@@ -38,7 +38,7 @@ class GraphicsScene(QGraphicsScene):
                 self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
                 self.firstClickLine = True
 
-        if drawingRects:
+        elif drawingRects:
             if self.firstClickRect:
                 self.start = event.scenePos()
                 self.firstClickRect = False
@@ -50,6 +50,7 @@ class GraphicsScene(QGraphicsScene):
                     self.start.y,self.end.y=self.end.y,self.start.y
                 self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickRect = True
+
         # if drawingCircles:
 
         else:
