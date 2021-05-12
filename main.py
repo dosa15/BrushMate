@@ -61,7 +61,7 @@ class GraphicsScene(QGraphicsScene):
         elif drawingSquares:
             if self.firstClickSquare:
                 self.start = event.scenePos()
-                self.firstClickRect = False
+                self.firstClickSquare = False
             else:
                 self.end = event.scenePos()
                 if(self.start.x() == self.end.x()):
