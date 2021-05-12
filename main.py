@@ -7,6 +7,8 @@ import sys, random
 
 freeHand = False
 freeHandDraw = False
+eraser = False
+eraserDraw = False
 drawingLines = False
 drawingRects = False
 drawingSquares = False
@@ -21,6 +23,7 @@ class GraphicsScene(QGraphicsScene):
         self.setAllFirstClicksTrue()
         self.start = self.end = QPointF(-1, -1)
         self.pen = QPen(Qt.black)
+        self.eraser = QPen(Qt.white, 25)
 
     def setAllFirstClicksTrue(self):
         self.firstClickLine = True
@@ -30,10 +33,14 @@ class GraphicsScene(QGraphicsScene):
         self.firstClickEllipse = True
 
     def mousePressEvent(self, event):
-        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
 
         if freeHand:
             freeHandDraw = True
+            self.start = event.scenePos()
+
+        if eraser:
+            eraserDraw = True
             self.start = event.scenePos()
 
         elif drawingLines:
@@ -104,18 +111,26 @@ class GraphicsScene(QGraphicsScene):
 
 
     def mouseMoveEvent(self, event):
-        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
 
         if freeHandDraw:
             self.end = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
             self.start = self.end
+        
+        if eraserDraw:
+            self.end = event.scenePos()
+            self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.eraser)
+            self.start = self.end
 
     def mouseReleaseEvent(self, event):
-        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
 
         if freeHandDraw:
             freeHandDraw = False
+        
+        if eraserDraw:
+            eraserDraw = False
 
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -124,6 +139,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(BrushMateWindow, self).__init__(parent)
         self.setupUi(self)
         self.scene = GraphicsScene(self)
+        self.scene.setBackgroundBrush(QBrush(Qt.white))
         self.graphicsView.setScene(self.scene)
         self.graphicsView.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.mouseButton.setChecked(True)
@@ -136,6 +152,17 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
 
+        self.retranslateUi(Ui_MainWindow)
+        QMetaObject.connectSlotsByName(self)
+
+        self.filename = None
+        self.actionSave.triggered.connect(self.fileSave)
+        self.actionSave_As.triggered.connect(lambda: self.fileSave(saveAs=True))
+
+    def retranslateUi(self, MainWindow):
+        _translate = QCoreApplication.translate
+        self.actionSave.setShortcut(_translate("Ui_MainWindow", "Ctrl+S"))
+        self.actionSave_As.setShortcut(_translate("Ui_MainWindow", "Ctrl+Shift+S"))
 
     def mouseClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
@@ -149,6 +176,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.freehandButton.setChecked(True)
         self.setallFalse()
+        self.setCursor(Qt.CrossCursor)
 
         if freeHand:
             freeHand = False
@@ -157,10 +185,16 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
     def eraserClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
         self.setallFalse()
+        self.setCursor(Qt.CrossCursor)
+
+        if eraser:
+            eraser = False
+        else:
+            eraser = True
 
 
     def assignShapesMenu(self):
@@ -230,6 +264,36 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         global freeHand, freeHandDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         freeHand = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = False
 
+
+    def fileSave(self, saveAs=False):
+        area = self.scene.sceneRect()
+        image = QImage(area.width(), area.height(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(image)
+        imageRect = image.rect().getRect()
+        imageRect = QRectF(*imageRect)
+        painter.setRenderHint(QPainter.Antialiasing)
+        self.scene.render(painter, imageRect, area)
+        painter.end()
+
+        if self.filename == None or saveAs:
+            getFile, ok = QInputDialog.getText(self, 'Save As', 'Enter the name of your BrushMate project (.jpg, .jpeg, .png):')
+            if ok:
+                getFile = getFile.split('.')
+                self.filename = getFile[0]
+                if len(getFile) > 1 and getFile[1] in ("jpg", "jpeg", "png"):
+                    self.filename += "." + getFile[1]
+                else:
+                    self.filename += ".jpeg"
+
+        image.save(self.filename)
+        print("saved as " + self.filename)
+        # fileInfo = QFormLayout()
+        # queryLabel = QLabel('Enter the name of your BrushMate file:')
+        # file = QLineEdit()
+        # filetype = QComboBox()
+        # filetype.addItems([".jpg", ".jpeg", ".png"])
+        # filetype.currentIndexChanged.connect(self.chooseFileType)
+        
 
 if __name__ == '__main__':
     import sys
