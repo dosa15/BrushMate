@@ -80,9 +80,9 @@ class GraphicsScene(QGraphicsScene):
                 if(self.start.y() > self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
                 if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
-                    self.end.x = self.end.y
+                    self.end.x += self.end.y - self.start.y
                 if(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
-                    self.end.y = self.end.x
+                    self.end.y += self.end.x - self.start.y
                 if(self.end.x() - self.start.x() == self.end.y() - self.start.y()):
                     self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickSquare = True
@@ -98,9 +98,9 @@ class GraphicsScene(QGraphicsScene):
                 if(self.start.y() > self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
                 if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
-                    self.end.x = self.end.y
+                    self.end.x += self.end.y - self.start.y
                 if(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
-                    self.end.y = self.end.x
+                    self.end.y += self.end.x - self.start.y
                 if(self.end.x() - self.start.x() == self.end.y() - self.start.y()):
                     self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickCircle = True
