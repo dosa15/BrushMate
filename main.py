@@ -39,7 +39,7 @@ class GraphicsScene(QGraphicsScene):
             freeHandDraw = True
             self.start = event.scenePos()
 
-        if eraser:
+        elif eraser:
             eraserDraw = True
             self.start = event.scenePos()
 
