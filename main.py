@@ -23,7 +23,7 @@ class GraphicsScene(QGraphicsScene):
         self.setAllFirstClicksTrue()
         self.start = self.end = QPointF(-1, -1)
         self.pen = QPen(Qt.black)
-        self.eraser = QPen(Qt.white, 25)
+        self.eraser = QPen(Qt.color0, 25) # Color0 is automatically set as the color of the background
 
     def setAllFirstClicksTrue(self):
         self.firstClickLine = True
@@ -38,10 +38,12 @@ class GraphicsScene(QGraphicsScene):
         if freeHand:
             freeHandDraw = True
             self.start = event.scenePos()
+            self.addLine(self.start.x(), self.start.y(), self.start.x(), self.start.y(), pen=self.pen)
 
         elif eraser:
             eraserDraw = True
             self.start = event.scenePos()
+            self.addLine(self.start.x(), self.start.y(), self.start.x(), self.start.y(), pen=self.eraser)
 
         elif drawingLines:
             if self.firstClickLine:
@@ -151,6 +153,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.clicked.connect(self.insertTextClicked)
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
+        self.setCursor(Qt.CrossCursor)
 
         self.retranslateUi(Ui_MainWindow)
         QMetaObject.connectSlotsByName(self)
@@ -172,16 +175,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
     def freehandClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.freehandButton.setChecked(True)
         self.setallFalse()
-        self.setCursor(Qt.CrossCursor)
-
-        if freeHand:
-            freeHand = False
-        else:
-            freeHand = True
+        freeHand = True
 
 
     def eraserClicked(self):
@@ -189,12 +187,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
         self.setallFalse()
-        self.setCursor(Qt.CrossCursor)
-
-        if eraser:
-            eraser = False
-        else:
-            eraser = True
+        eraser = True
 
 
     def assignShapesMenu(self):
@@ -262,7 +255,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def setallFalse(self):
         global freeHand, freeHandDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
-        freeHand = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = False
+        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = False
 
 
     def fileSave(self, saveAs=False):
@@ -285,8 +278,9 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 else:
                     self.filename += ".jpeg"
 
-        image.save(self.filename)
-        print("saved as " + self.filename)
+        if self.filename is not None:
+            image.save(self.filename)
+            print("saved as " + self.filename)
         # fileInfo = QFormLayout()
         # queryLabel = QLabel('Enter the name of your BrushMate file:')
         # file = QLineEdit()
