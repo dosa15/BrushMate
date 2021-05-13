@@ -23,7 +23,9 @@ class GraphicsScene(QGraphicsScene):
         self.setAllFirstClicksTrue()
         self.start = self.end = QPointF(-1, -1)
         self.pen = QPen(Qt.black)
+        self.pen.setCapStyle(Qt.RoundCap)
         self.eraser = QPen(Qt.color0, 25) # Color0 is automatically set as the color of the background
+        self.eraser.setCapStyle(Qt.RoundCap)
 
     def setAllFirstClicksTrue(self):
         self.firstClickLine = True
@@ -165,6 +167,8 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.clicked.connect(self.insertTextClicked)
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
+        self.insertImgButton.clicked.connect(self.insertImgClicked)
+
         self.setCursor(Qt.CrossCursor)
 
         self.retranslateUi(Ui_MainWindow)
@@ -237,6 +241,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
         self.setallFalse()
+        
+        imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
+        # Load the image and resize it to fit the QGraphicsScene
+        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(self.scene.width()), int(self.scene.height()), aspectRatioMode=Qt.KeepAspectRatio))
+        self.scene.addPixmap(image)
 
 
     def insertTextClicked(self):
