@@ -271,7 +271,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.floodfillButton.setChecked(False)
 
     def setallFalse(self):
-        global freeHand, freeHandDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = False
 
 
