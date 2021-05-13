@@ -169,7 +169,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.floodfillButton.clicked.connect(self.floodfillClicked)
         self.insertImgButton.clicked.connect(self.insertImgClicked)
 
-        self.setCursor(Qt.CrossCursor)
+        self.graphicsView.setCursor(Qt.CrossCursor)
 
         self.retranslateUi(Ui_MainWindow)
         QMetaObject.connectSlotsByName(self)
