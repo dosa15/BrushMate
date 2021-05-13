@@ -174,6 +174,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave.triggered.connect(self.fileSave)
         self.actionSave_As.triggered.connect(lambda: self.fileSave(saveAs=True))
 
+        # openFile = QtGui.QAction("&Open File", self)
+        # openFile.setShortcut("Ctrl+O")
+        # openFile.setStatusTip('Open File')
+        # openFile.triggered.connect(self.file_open)
+
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
         self.actionSave.setShortcut(_translate("Ui_MainWindow", "Ctrl+S"))
@@ -299,6 +304,16 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # filetype = QComboBox()
         # filetype.addItems([".jpg", ".jpeg", ".png"])
         # filetype.currentIndexChanged.connect(self.chooseFileType)
+
+        # def file_open(self):
+        # name = QtGui.QFileDialog.getOpenFileName(self, 'Open File')
+        # file = open(name,'r')
+
+        # self.editor()
+
+        # with file:
+        #     text = file.read()
+        #     self.textEdit.setText(text)
         
 
 if __name__ == '__main__':
