@@ -187,6 +187,62 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.button.clicked.connect(self.show_new_window)
         self.setCentralWidget(self.button)
 
+        self.undoStack = QUndoStack(self)
+
+    def add(self):
+        row = self.listWidget.currentRow()
+        title = "Add %s" % self.name
+        string, ok = QInputDialog.getText(self, title, "&Add:")
+        if ok and not string.isEmpty():
+            command = CommandAdd(self.listWidget, row, string,
+                                 "Add (%s)" % string)
+            self.undoStack.push(command)
+
+    class CommandAdd(QUndoCommand):
+
+    def __init__(self, listWidget, row, string, description):
+        super(CommandAdd, self).__init__(description)
+        self.listWidget = listWidget
+        self.row = row
+        self.string = string
+
+    def redo(self):
+        self.listWidget.insertItem(self.row, self.string)
+        self.listWidget.setCurrentRow(self.row)
+
+    def undo(self):
+        item = self.listWidget.takeItem(self.row)
+        del item
+
+    def delete(self):
+        row = self.listWidget.currentRow()
+        item = self.listWidget.item(row)
+        if item is None:
+            return
+        reply = QMessageBox.question(self, "Remove %s" % self.name,
+                        "Remove %s ´%s’?" % (
+                        self.name, unicode(item.text())),
+                        QMessageBox.Yes|QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            command = CommandDelete(self.listWidget, item, row,
+                                    "Delete (%s)" % item.text())
+            self.undoStack.push(command)
+            
+    class CommandDelete(QUndoCommand):
+
+    def __init__(self, listWidget, item, row, description):
+        super(CommandDelete, self).__init__(description)
+        self.listWidget = listWidget
+        self.string = item.text()
+        self.row = row
+
+    def redo(self):
+        item = self.listWidget.takeItem(self.row)
+        del item
+
+    def undo(self):
+        self.listWidget.insertItem(self.row, self.string)
+
     def show_new_window(self, checked):
         if self.w is None:
             self.w = AnotherWindow()
