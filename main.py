@@ -129,7 +129,7 @@ class GraphicsScene(QGraphicsScene):
             self.end = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.pen)
             self.start = self.end
-        
+
         if eraserDraw:
             self.end = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.eraser)
@@ -140,7 +140,7 @@ class GraphicsScene(QGraphicsScene):
 
         if freeHandDraw:
             freeHandDraw = False
-        
+
         if eraserDraw:
             eraserDraw = False
 
@@ -200,48 +200,48 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     class CommandAdd(QUndoCommand):
 
-    def __init__(self, listWidget, row, string, description):
-        super(CommandAdd, self).__init__(description)
-        self.listWidget = listWidget
-        self.row = row
-        self.string = string
+        def __init__(self, listWidget, row, string, description):
+            super(CommandAdd, self).__init__(description)
+            self.listWidget = listWidget
+            self.row = row
+            self.string = string
 
-    def redo(self):
-        self.listWidget.insertItem(self.row, self.string)
-        self.listWidget.setCurrentRow(self.row)
+        def redo(self):
+            self.listWidget.insertItem(self.row, self.string)
+            self.listWidget.setCurrentRow(self.row)
 
-    def undo(self):
-        item = self.listWidget.takeItem(self.row)
-        del item
+        def undo(self):
+            item = self.listWidget.takeItem(self.row)
+            del item
 
-    def delete(self):
-        row = self.listWidget.currentRow()
-        item = self.listWidget.item(row)
-        if item is None:
-            return
-        reply = QMessageBox.question(self, "Remove %s" % self.name,
-                        "Remove %s ´%s’?" % (
-                        self.name, unicode(item.text())),
-                        QMessageBox.Yes|QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            command = CommandDelete(self.listWidget, item, row,
-                                    "Delete (%s)" % item.text())
-            self.undoStack.push(command)
-            
+        def delete(self):
+            row = self.listWidget.currentRow()
+            item = self.listWidget.item(row)
+            if item is None:
+                return
+            reply = QMessageBox.question(self, "Remove %s" % self.name,
+                            "Remove %s ´%s’?" % (
+                            self.name, unicode(item.text())),
+                            QMessageBox.Yes|QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                command = CommandDelete(self.listWidget, item, row,
+                                        "Delete (%s)" % item.text())
+                self.undoStack.push(command)
+
     class CommandDelete(QUndoCommand):
 
-    def __init__(self, listWidget, item, row, description):
-        super(CommandDelete, self).__init__(description)
-        self.listWidget = listWidget
-        self.string = item.text()
-        self.row = row
+        def __init__(self, listWidget, item, row, description):
+            super(CommandDelete, self).__init__(description)
+            self.listWidget = listWidget
+            self.string = item.text()
+            self.row = row
 
-    def redo(self):
-        item = self.listWidget.takeItem(self.row)
-        del item
+        def redo(self):
+            item = self.listWidget.takeItem(self.row)
+            del item
 
-    def undo(self):
-        self.listWidget.insertItem(self.row, self.string)
+        def undo(self):
+            self.listWidget.insertItem(self.row, self.string)
 
     def show_new_window(self, checked):
         if self.w is None:
@@ -309,7 +309,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
         self.setallFalse()
-        
+
         imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
         # Load the image and resize it to fit the QGraphicsScene
         image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(self.scene.width()), int(self.scene.height()), aspectRatioMode=Qt.KeepAspectRatio))
@@ -382,7 +382,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # filetype.addItems([".jpg", ".jpeg", ".png"])
         # filetype.currentIndexChanged.connect(self.chooseFileType)
 
-        
+
 
 if __name__ == '__main__':
     import sys
