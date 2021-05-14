@@ -144,13 +144,13 @@ class GraphicsScene(QGraphicsScene):
         if eraserDraw:
             eraserDraw = False
 
-class AnotherWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        layout = QVBoxLayout()
-        self.label = QLabel("Another Window % d" % randint(0,100))
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+#class AnotherWindow(QWidget):
+ #   def __init__(self):
+  #      super().__init__()
+   #     layout = QVBoxLayout()
+    #    self.label = QLabel("Another Window % d" % randint(0,100))
+     #   layout.addWidget(self.label)
+      #  self.setLayout(layout)
 
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -182,12 +182,12 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave.triggered.connect(self.fileSave)
         self.actionSave_As.triggered.connect(lambda: self.fileSave(saveAs=True))
 
-        self.w = None  # No external window yet.
-        self.button = QPushButton("Push for Window")
-        self.button.clicked.connect(self.show_new_window)
-        self.setCentralWidget(self.button)
-
-        self.undoStack = QUndoStack(self)
+        # self.w = None  # No external window yet.
+        # self.button = QPushButton("Push for Window")
+        # self.button.clicked.connect(self.show_new_window)
+        # self.setCentralWidget(self.button)
+'''
+         self.undoStack = QUndoStack(self)
 
     def add(self):
         row = self.listWidget.currentRow()
@@ -250,7 +250,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.w.close()  # Close window.
             self.w = None  # Discard reference.
-
+'''
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
         self.actionSave.setShortcut(_translate("Ui_MainWindow", "Ctrl+S"))
