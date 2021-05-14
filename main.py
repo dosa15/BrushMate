@@ -75,16 +75,15 @@ class GraphicsScene(QGraphicsScene):
                 self.firstClickSquare = False
             else:
                 self.end = event.scenePos()
+                if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
+                    self.end.setX(self.start.x() + self.end.y() - self.start.y())
+                elif(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
+                    self.end.setY(self.start.y() + self.end.x() - self.start.x())
                 if(self.start.x() > self.end.x()):
                     self.start.x,self.end.x=self.end.x,self.start.x
                 if(self.start.y() > self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
-                if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
-                    self.end.setX(self.end.x + self.end.y - self.start.y)
-                if(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
-                    self.end.setY(self.end.y + self.end.x - self.start.y)
-                if(self.end.x() - self.start.x() == self.end.y() - self.start.y()):
-                    self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickSquare = True
 
         elif drawingCircles:
@@ -93,16 +92,15 @@ class GraphicsScene(QGraphicsScene):
                 self.firstClickCircle = False
             else:
                 self.end = event.scenePos()
+                if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
+                    self.end.setX(self.start.x() + self.end.y() - self.start.y())
+                elif(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
+                    self.end.setY(self.start.y() + self.end.x() - self.start.x())
                 if(self.start.x() > self.end.x()):
                     self.start.x,self.end.x=self.end.x,self.start.x
                 if(self.start.y() > self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
-                if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
-                    self.end.setX(self.end.x + self.end.y - self.start.y)
-                if(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
-                    self.end.setY(self.end.y + self.end.x - self.start.y)
-                if(self.end.x() - self.start.x() == self.end.y() - self.start.y()):
-                    self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickCircle = True
 
         elif drawingEllipses:
@@ -186,8 +184,8 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # self.button = QPushButton("Push for Window")
         # self.button.clicked.connect(self.show_new_window)
         # self.setCentralWidget(self.button)
-'''
-         self.undoStack = QUndoStack(self)
+    # '''
+        self.undoStack = QUndoStack(self)
 
     def add(self):
         row = self.listWidget.currentRow()
@@ -242,7 +240,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         def undo(self):
             self.listWidget.insertItem(self.row, self.string)
-
+    '''
     def show_new_window(self, checked):
         if self.w is None:
             self.w = AnotherWindow()
@@ -250,7 +248,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.w.close()  # Close window.
             self.w = None  # Discard reference.
-'''
+    '''
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
         self.actionSave.setShortcut(_translate("Ui_MainWindow", "Ctrl+S"))
