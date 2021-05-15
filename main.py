@@ -173,7 +173,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.graphicsView.setCursor(Qt.CrossCursor)
 
-        self.retranslateUi(Ui_MainWindow)
+        self.retranslateMainUi(Ui_MainWindow)
         QMetaObject.connectSlotsByName(self)
 
         self.filename = None
@@ -250,7 +250,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.w.close()  # Close window.
             self.w = None  # Discard reference.
     '''
-    def retranslateUi(self, MainWindow):
+    def retranslateMainUi(self, MainWindow):
         _translate = QCoreApplication.translate
         self.actionSave.setShortcut(_translate("Ui_MainWindow", "Ctrl+S"))
         self.actionSave_As.setShortcut(_translate("Ui_MainWindow", "Ctrl+Shift+S"))
