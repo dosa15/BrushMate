@@ -75,9 +75,9 @@ class GraphicsScene(QGraphicsScene):
                 self.firstClickSquare = False
             else:
                 self.end = event.scenePos()
-                if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
+                if(abs(self.end.x() - self.start.x()) > abs(self.end.y() - self.start.y())):
                     self.end.setX(self.start.x() + self.end.y() - self.start.y())
-                elif(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
+                elif(abs(self.end.x() - self.start.x()) < abs(self.end.y() - self.start.y())):
                     self.end.setY(self.start.y() + self.end.x() - self.start.x())
                 if(self.start.x() > self.end.x()):
                     self.start.x,self.end.x=self.end.x,self.start.x
@@ -92,9 +92,9 @@ class GraphicsScene(QGraphicsScene):
                 self.firstClickCircle = False
             else:
                 self.end = event.scenePos()
-                if(self.end.x() - self.start.x() > self.end.y() - self.start.y()):
+                if(abs(self.end.x() - self.start.x()) > abs(self.end.y() - self.start.y())):
                     self.end.setX(self.start.x() + self.end.y() - self.start.y())
-                elif(self.end.x() - self.start.x() < self.end.y() - self.start.y()):
+                elif(abs(self.end.x() - self.start.x()) < abs(self.end.y() - self.start.y())):
                     self.end.setY(self.start.y() + self.end.x() - self.start.x())
                 if(self.start.x() > self.end.x()):
                     self.start.x,self.end.x=self.end.x,self.start.x
