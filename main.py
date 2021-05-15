@@ -184,7 +184,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # self.button = QPushButton("Push for Window")
         # self.button.clicked.connect(self.show_new_window)
         # self.setCentralWidget(self.button)
-    # 
+        '''
         self.undoStack = QUndoStack(self)
 
     def add(self):
@@ -240,6 +240,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         def undo(self):
             self.listWidget.insertItem(self.row, self.string)
+            '''
     '''
     def show_new_window(self, checked):
         if self.w is None:
