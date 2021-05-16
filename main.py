@@ -142,15 +142,6 @@ class GraphicsScene(QGraphicsScene):
         if eraserDraw:
             eraserDraw = False
 
-#class AnotherWindow(QWidget):
- #   def __init__(self):
-  #      super().__init__()
-   #     layout = QVBoxLayout()
-    #    self.label = QLabel("Another Window % d" % randint(0,100))
-     #   layout.addWidget(self.label)
-      #  self.setLayout(layout)
-
-
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
@@ -180,76 +171,49 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave.triggered.connect(self.fileSave)
         self.actionSave_As.triggered.connect(lambda: self.fileSave(saveAs=True))
 
-        # self.w = None  # No external window yet.
-        # self.button = QPushButton("Push for Window")
-        # self.button.clicked.connect(self.show_new_window)
-        # self.setCentralWidget(self.button)
-        '''
         self.undoStack = QUndoStack(self)
 
-    def add(self):
+class CommandAdd(QUndoCommand):
+
+    def __init__(self, listWidget, row, string, description):
+        super(CommandAdd, self).__init__(description)
+        self.listWidget = listWidget
+        self.row = row
+        self.string = string
+
+    def redo(self):
+        self.listWidget.insertItem(self.row, self.string)
+        self.listWidget.setCurrentRow(self.row)
+
+    def undo(self):
+        item = self.listWidget.takeItem(self.row)
+        del item
+
+    def delete(self):
         row = self.listWidget.currentRow()
-        title = "Add %s" % self.name
-        string, ok = QInputDialog.getText(self, title, "&Add:")
-        if ok and not string.isEmpty():
-            command = CommandAdd(self.listWidget, row, string,
-                                 "Add (%s)" % string)
+        item = self.listWidget.item(row)
+        if item is None:
+            return
+        reply = QMessageBox.question(self, "Remove %s" % self.name, "Remove %s ´%s’?" % (self.name, unicode(item.text())), QMessageBox.Yes|QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            command = CommandDelete(self.listWidget, item, row, "Delete (%s)" % item.text())
             self.undoStack.push(command)
 
-    class CommandAdd(QUndoCommand):
+class CommandDelete(QUndoCommand):
 
-        def __init__(self, listWidget, row, string, description):
-            super(CommandAdd, self).__init__(description)
-            self.listWidget = listWidget
-            self.row = row
-            self.string = string
+    def __init__(self, listWidget, item, row, description):
+        super(CommandDelete, self).__init__(description)
+        self.listWidget = listWidget
+        self.string = item.text()
+        self.row = row
 
-        def redo(self):
-            self.listWidget.insertItem(self.row, self.string)
-            self.listWidget.setCurrentRow(self.row)
+    def redo(self):
+        item = self.listWidget.takeItem(self.row)
+        del item
 
-        def undo(self):
-            item = self.listWidget.takeItem(self.row)
-            del item
+    def undo(self):
+        self.listWidget.insertItem(self.row, self.string)
 
-        def delete(self):
-            row = self.listWidget.currentRow()
-            item = self.listWidget.item(row)
-            if item is None:
-                return
-            reply = QMessageBox.question(self, "Remove %s" % self.name,
-                            "Remove %s ´%s’?" % (
-                            self.name, unicode(item.text())),
-                            QMessageBox.Yes|QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                command = CommandDelete(self.listWidget, item, row,
-                                        "Delete (%s)" % item.text())
-                self.undoStack.push(command)
-
-    class CommandDelete(QUndoCommand):
-
-        def __init__(self, listWidget, item, row, description):
-            super(CommandDelete, self).__init__(description)
-            self.listWidget = listWidget
-            self.string = item.text()
-            self.row = row
-
-        def redo(self):
-            item = self.listWidget.takeItem(self.row)
-            del item
-
-        def undo(self):
-            self.listWidget.insertItem(self.row, self.string)
-            '''
-    '''
-    def show_new_window(self, checked):
-        if self.w is None:
-            self.w = AnotherWindow()
-            self.w.show()
-        else:
-            self.w.close()  # Close window.
-            self.w = None  # Discard reference.
-    '''
     def retranslateMainUi(self, MainWindow):
         _translate = QCoreApplication.translate
         self.actionSave.setShortcut(_translate("Ui_MainWindow", "Ctrl+S"))
@@ -261,7 +225,6 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mouseButton.setChecked(True)
         self.setallFalse()
 
-
     def freehandClicked(self):
         global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
@@ -269,14 +232,12 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setallFalse()
         freeHand = True
 
-
     def eraserClicked(self):
         global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
         self.setallFalse()
         eraser = True
-
 
     def assignShapesMenu(self):
         menu = QMenu(self.shapesButton, triggered=self.shapesClicked)
@@ -301,7 +262,6 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             drawingCircles = True
         elif action.text() == "Ellipse":
             drawingEllipses = True
-
 
     def insertImgClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
@@ -328,13 +288,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.cloneStampButton.setChecked(True)
         self.setallFalse()
 
-
     def floodfillClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setallFalse()
-
 
     def uncheckAllButtons(self):
         self.mouseButton.setChecked(False)
@@ -349,7 +307,6 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def setallFalse(self):
         global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = False
-
 
     def fileSave(self, saveAs=False):
         area = self.scene.sceneRect()
@@ -380,8 +337,6 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # filetype = QComboBox()
         # filetype.addItems([".jpg", ".jpeg", ".png"])
         # filetype.currentIndexChanged.connect(self.chooseFileType)
-
-
 
 if __name__ == '__main__':
     import sys
