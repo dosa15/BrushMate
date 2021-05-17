@@ -148,7 +148,7 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>76</width>
+      <width>81</width>
       <height>671</height>
      </rect>
     </property>
@@ -332,6 +332,40 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>assets/size slider.png</normaloff>assets/size slider.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>assets/color picker.png</normaloff>assets/color picker.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QGraphicsView" name="graphicsView">
@@ -369,7 +403,7 @@
      <x>0</x>
      <y>0</y>
      <width>790</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
