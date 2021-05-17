@@ -151,7 +151,7 @@ class GraphicsScene(QGraphicsScene):
         if eraserDraw:
             eraserDraw = False
 
-    def colorPen(self, color):
+    def setPenColor(self, color):
         self.pen.setColor(color)
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -173,7 +173,8 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
         self.insertImgButton.clicked.connect(self.insertImgClicked)
-        self.colorPickerButton.clicked.connect(self.colorPick)
+        self.sizeSliderButton.clicked.connect(self.sizeSliderClicked)
+        self.colorPickerButton.clicked.connect(self.colorPickerClicked)
 
         self.graphicsView.setCursor(Qt.CrossCursor)
 
@@ -263,11 +264,55 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.floodfillButton.setChecked(True)
         self.setallFalse()
 
-    def colorPick(self):
+    class SizeSlider(QWidget):
+        def __init__(self, parent = None):
+            super().__init__(parent)
+            self.setGeometry(QRect(500, 300, 500, 200))
+            layout = QVBoxLayout()
+            self.sizeTitle = QLabel("Pick size from 1 - 50")
+            self.sizeTitle.setAlignment(Qt.AlignCenter)
+            layout.addWidget(self.sizeTitle)
+                
+            self.sizePicker = QSlider(Qt.Horizontal)
+            self.sizePicker.setRange(1, 50)
+            self.sizePicker.setValue(1)
+            self.size = 1
+            self.sizePicker.setTickPosition(QSlider.TicksBelow)
+            self.sizePicker.setTickInterval(1)
+            self.sizePicker.valueChanged.connect(self.sizeChange)
+            layout.addWidget(self.sizePicker)
+
+            self.sizeValue = QLabel(str(self.size))
+            self.sizeValue.setAlignment(Qt.AlignCenter)
+            layout.addWidget(self.sizeValue)
+
+            self.setLayout(layout)
+            self.setWindowTitle("Pen Size")
+            print("Init with: ", self.size)
+
+        def sizeChange(self, value):
+            self.size = value
+            self.sizeValue.setText(str(value))
+            print(self.size)
+        
+        def getSize(self):
+            print("Finished with: ", self.size)
+            return self.size
+
+    def sizeSliderClicked(self):
+        self.uncheckAllButtons()
+        self.sizeSliderButton.setChecked(True)
+        self.sizeSlider = self.SizeSlider()
+        self.sizeSlider.show()
+        # while(self.sizeSlider.isActiveWindow()):
+            # pass
+        self.scene.pen.setWidth(self.sizeSlider.getSize())
+
+    def colorPickerClicked(self):
         global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         color = QColorDialog.getColor()
-        self.scene.colorPen(color)
+        self.scene.setPenColor(color)
         self.colorPickerButton.setChecked(True)
         self.setallFalse()
 
