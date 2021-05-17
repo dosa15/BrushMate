@@ -333,7 +333,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="sizeSliderButton">
        <property name="palette">
         <palette>
          <active>
@@ -522,7 +522,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="colorPickerButton">
        <property name="palette">
         <palette>
          <active>
