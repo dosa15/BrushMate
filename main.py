@@ -14,6 +14,8 @@ drawingRects = False
 drawingSquares = False
 drawingCircles = False
 drawingEllipses = False
+drawingPenSize = 1
+changedPenSize = False
 insertingText = False
 textboxContents = ""
 
@@ -265,18 +267,18 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setallFalse()
 
     class SizeSlider(QWidget):
-        def __init__(self, parent = None):
+        def __init__(self, size, parent = None):
             super().__init__(parent)
             self.setGeometry(QRect(500, 300, 500, 200))
             layout = QVBoxLayout()
-            self.sizeTitle = QLabel("Pick size from 1 - 50")
+            self.sizeTitle = QLabel("Pick size from 1 - 50\n(Click on the slider button again to confirm)")
             self.sizeTitle.setAlignment(Qt.AlignCenter)
             layout.addWidget(self.sizeTitle)
                 
             self.sizePicker = QSlider(Qt.Horizontal)
             self.sizePicker.setRange(1, 50)
-            self.sizePicker.setValue(1)
-            self.size = 1
+            self.sizePicker.setValue(size)
+            self.size = size
             self.sizePicker.setTickPosition(QSlider.TicksBelow)
             self.sizePicker.setTickInterval(1)
             self.sizePicker.valueChanged.connect(self.sizeChange)
@@ -288,25 +290,25 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.setLayout(layout)
             self.setWindowTitle("Pen Size")
-            print("Init with: ", self.size)
 
         def sizeChange(self, value):
-            self.size = value
+            global drawingPenSize
+            drawingPenSize = value
             self.sizeValue.setText(str(value))
-            print(self.size)
-        
-        def getSize(self):
-            print("Finished with: ", self.size)
-            return self.size
 
     def sizeSliderClicked(self):
-        self.uncheckAllButtons()
-        self.sizeSliderButton.setChecked(True)
-        self.sizeSlider = self.SizeSlider()
-        self.sizeSlider.show()
-        # while(self.sizeSlider.isActiveWindow()):
-            # pass
-        self.scene.pen.setWidth(self.sizeSlider.getSize())
+        global changedPenSize, drawingPenSize
+        if not changedPenSize:
+            self.uncheckAllButtons()
+            self.sizeSliderButton.setChecked(True)
+            size = self.scene.pen.width()
+            self.sizeSlider = self.SizeSlider(size)
+            self.sizeSlider.show()
+            changedPenSize = True
+        else:
+            self.scene.pen.setWidth(drawingPenSize)
+            self.scene.eraser.setWidth(drawingPenSize)
+            changedPenSize = False
 
     def colorPickerClicked(self):
         global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
