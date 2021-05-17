@@ -69,7 +69,7 @@ class GraphicsScene(QGraphicsScene):
                     self.start.x,self.end.x=self.end.x,self.start.x
                 if(self.start.y()>self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
-                self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())), pen=self.pen)
                 self.firstClickRect = True
 
         elif drawingSquares:
@@ -86,7 +86,7 @@ class GraphicsScene(QGraphicsScene):
                     self.start.x,self.end.x=self.end.x,self.start.x
                 if(self.start.y() > self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
-                self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())), pen=self.pen)
                 self.firstClickSquare = True
 
         elif drawingCircles:
@@ -103,7 +103,7 @@ class GraphicsScene(QGraphicsScene):
                     self.start.x,self.end.x=self.end.x,self.start.x
                 if(self.start.y() > self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
-                self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())), pen=self.pen)
                 self.firstClickCircle = True
 
         elif drawingEllipses:
@@ -116,7 +116,7 @@ class GraphicsScene(QGraphicsScene):
                     self.start.x,self.end.x=self.end.x,self.start.x
                 if(self.start.y()>self.end.y()):
                     self.start.y,self.end.y=self.end.y,self.start.y
-                self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
+                self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())), pen=self.pen)
                 self.firstClickEllipse = True
 
         elif insertingText:
