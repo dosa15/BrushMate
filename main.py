@@ -303,6 +303,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setallFalse()
+'''
+    def colorPick(self):
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+
+'''
 
     def uncheckAllButtons(self):
         self.mouseButton.setChecked(False)
