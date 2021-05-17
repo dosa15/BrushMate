@@ -14,6 +14,8 @@ drawingRects = False
 drawingSquares = False
 drawingCircles = False
 drawingEllipses = False
+insertingText = False
+textboxContents = ""
 
 class GraphicsScene(QGraphicsScene):
 
@@ -33,9 +35,10 @@ class GraphicsScene(QGraphicsScene):
         self.firstClickSquare = True
         self.firstClickCircle = True
         self.firstClickEllipse = True
+        self.firstClickText = True
 
     def mousePressEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
 
         if freeHand:
             freeHandDraw = True
@@ -116,6 +119,12 @@ class GraphicsScene(QGraphicsScene):
                 self.addEllipse(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())))
                 self.firstClickEllipse = True
 
+        elif insertingText:
+            global textboxContents
+            self.addText(textboxContents).setPos(event.scenePos())
+            #textBox.setPos(event.scenePos().x, event.scenePos.y)
+            #textItem.setPos(self.start)
+
         else:
             self.setAllFirstClicksTrue()
 
@@ -134,13 +143,15 @@ class GraphicsScene(QGraphicsScene):
             self.start = self.end
 
     def mouseReleaseEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
 
         if freeHandDraw:
             freeHandDraw = False
 
         if eraserDraw:
             eraserDraw = False
+
+
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
@@ -220,20 +231,20 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave_As.setShortcut(_translate("Ui_MainWindow", "Ctrl+Shift+S"))
 
     def mouseClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.mouseButton.setChecked(True)
         self.setallFalse()
 
     def freehandClicked(self):
-        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.freehandButton.setChecked(True)
         self.setallFalse()
         freeHand = True
 
     def eraserClicked(self):
-        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
         self.setallFalse()
@@ -247,7 +258,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot(QtWidgets.QAction)
     def shapesClicked(self, action):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.shapesButton.setChecked(True)
 
@@ -264,7 +275,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             drawingEllipses = True
 
     def insertImgClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
         self.setallFalse()
@@ -275,19 +286,20 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.scene.addPixmap(image)
 
     def insertTextClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, textboxContents
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
         self.setallFalse()
-
+        insertingText = True
+        textboxContents, ok = QInputDialog.getText(self, 'Text Box', 'Insert Text')
     def cloneStampClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.cloneStampButton.setChecked(True)
         self.setallFalse()
 
     def floodfillClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setallFalse()
@@ -301,10 +313,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.setChecked(False)
         self.cloneStampButton.setChecked(False)
         self.floodfillButton.setChecked(False)
+        self.insertTextButton.setChecked(False)
 
     def setallFalse(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
-        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = False
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingText = False
 
     def fileSave(self, saveAs=False):
         area = self.scene.sceneRect()
