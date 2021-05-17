@@ -173,46 +173,46 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.undoStack = QUndoStack(self)
 
-class CommandAdd(QUndoCommand):
+    class CommandAdd(QUndoCommand):
 
-    def __init__(self, listWidget, row, string, description):
-        super(CommandAdd, self).__init__(description)
-        self.listWidget = listWidget
-        self.row = row
-        self.string = string
+        def __init__(self, listWidget, row, string, description):
+            super(CommandAdd, self).__init__(description)
+            self.listWidget = listWidget
+            self.row = row
+            self.string = string
 
-    def redo(self):
-        self.listWidget.insertItem(self.row, self.string)
-        self.listWidget.setCurrentRow(self.row)
+        def redo(self):
+            self.listWidget.insertItem(self.row, self.string)
+            self.listWidget.setCurrentRow(self.row)
 
-    def undo(self):
-        item = self.listWidget.takeItem(self.row)
-        del item
+        def undo(self):
+            item = self.listWidget.takeItem(self.row)
+            del item
 
-    def delete(self):
-        row = self.listWidget.currentRow()
-        item = self.listWidget.item(row)
-        if item is None:
-            return
-        reply = QMessageBox.question(self, "Remove %s" % self.name, "Remove %s ´%s’?" % (self.name, unicode(item.text())), QMessageBox.Yes|QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            command = CommandDelete(self.listWidget, item, row, "Delete (%s)" % item.text())
-            self.undoStack.push(command)
+        def delete(self):
+            row = self.listWidget.currentRow()
+            item = self.listWidget.item(row)
+            if item is None:
+                return
+            reply = QMessageBox.question(self, "Remove %s" % self.name, "Remove %s ´%s’?" % (self.name, unicode(item.text())), QMessageBox.Yes|QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                command = CommandDelete(self.listWidget, item, row, "Delete (%s)" % item.text())
+                self.undoStack.push(command)
 
-class CommandDelete(QUndoCommand):
+    class CommandDelete(QUndoCommand):
 
-    def __init__(self, listWidget, item, row, description):
-        super(CommandDelete, self).__init__(description)
-        self.listWidget = listWidget
-        self.string = item.text()
-        self.row = row
+        def __init__(self, listWidget, item, row, description):
+            super(CommandDelete, self).__init__(description)
+            self.listWidget = listWidget
+            self.string = item.text()
+            self.row = row
 
-    def redo(self):
-        item = self.listWidget.takeItem(self.row)
-        del item
+        def redo(self):
+            item = self.listWidget.takeItem(self.row)
+            del item
 
-    def undo(self):
-        self.listWidget.insertItem(self.row, self.string)
+        def undo(self):
+            self.listWidget.insertItem(self.row, self.string)
 
     def retranslateMainUi(self, MainWindow):
         _translate = QCoreApplication.translate
@@ -274,13 +274,11 @@ class CommandDelete(QUndoCommand):
         image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(self.scene.width()), int(self.scene.height()), aspectRatioMode=Qt.KeepAspectRatio))
         self.scene.addPixmap(image)
 
-
     def insertTextClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
         self.setallFalse()
-
 
     def cloneStampClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
