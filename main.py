@@ -220,20 +220,20 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave_As.setShortcut(_translate("Ui_MainWindow", "Ctrl+Shift+S"))
 
     def mouseClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.mouseButton.setChecked(True)
         self.setallFalse()
 
     def freehandClicked(self):
-        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.freehandButton.setChecked(True)
         self.setallFalse()
         freeHand = True
 
     def eraserClicked(self):
-        global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
         self.setallFalse()
@@ -247,7 +247,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot(QtWidgets.QAction)
     def shapesClicked(self, action):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.shapesButton.setChecked(True)
 
@@ -264,7 +264,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             drawingEllipses = True
 
     def insertImgClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
         self.setallFalse()
@@ -275,22 +275,27 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.scene.addPixmap(image)
 
     def insertTextClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
         self.setallFalse()
 
     def cloneStampClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.cloneStampButton.setChecked(True)
         self.setallFalse()
 
     def floodfillClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setallFalse()
+'''
+    def colorPick(self):
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        
+'''
 
     def uncheckAllButtons(self):
         self.mouseButton.setChecked(False)
