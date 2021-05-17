@@ -151,7 +151,8 @@ class GraphicsScene(QGraphicsScene):
         if eraserDraw:
             eraserDraw = False
 
-
+    def colorPen(self, color):
+        self.pen.setColor(color)
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
@@ -181,49 +182,6 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.filename = None
         self.actionSave.triggered.connect(self.fileSave)
         self.actionSave_As.triggered.connect(lambda: self.fileSave(saveAs=True))
-
-        self.undoStack = QUndoStack(self)
-
-    class CommandAdd(QUndoCommand):
-
-        def __init__(self, listWidget, row, string, description):
-            super(CommandAdd, self).__init__(description)
-            self.listWidget = listWidget
-            self.row = row
-            self.string = string
-
-        def redo(self):
-            self.listWidget.insertItem(self.row, self.string)
-            self.listWidget.setCurrentRow(self.row)
-
-        def undo(self):
-            item = self.listWidget.takeItem(self.row)
-            del item
-
-        def delete(self):
-            row = self.listWidget.currentRow()
-            item = self.listWidget.item(row)
-            if item is None:
-                return
-            reply = QMessageBox.question(self, "Remove %s" % self.name, "Remove %s ´%s’?" % (self.name, unicode(item.text())), QMessageBox.Yes|QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                command = CommandDelete(self.listWidget, item, row, "Delete (%s)" % item.text())
-                self.undoStack.push(command)
-
-    class CommandDelete(QUndoCommand):
-
-        def __init__(self, listWidget, item, row, description):
-            super(CommandDelete, self).__init__(description)
-            self.listWidget = listWidget
-            self.string = item.text()
-            self.row = row
-
-        def redo(self):
-            item = self.listWidget.takeItem(self.row)
-            del item
-
-        def undo(self):
-            self.listWidget.insertItem(self.row, self.string)
 
     def retranslateMainUi(self, MainWindow):
         _translate = QCoreApplication.translate
@@ -303,11 +261,14 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setallFalse()
-'''
+
     def colorPick(self):
         global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
-
-'''
+        self.uncheckAllButtons()
+        color = QColorDialog.getColor()
+        self.scene.colorPen(color)
+        self.colorPickerButton.setChecked(True)
+        self.setallFalse()
 
     def uncheckAllButtons(self):
         self.mouseButton.setChecked(False)
