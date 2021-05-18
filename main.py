@@ -155,6 +155,10 @@ class GraphicsScene(QGraphicsScene):
 
     def setPenColor(self, color):
         self.pen.setColor(color)
+    
+    def setPenSize(self, size):
+        self.pen.setWidth(size)
+        self.eraser.setWidth(size)
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
@@ -196,20 +200,20 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.mouseButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
 
     def freehandClicked(self):
         global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.freehandButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
         freeHand = True
 
     def eraserClicked(self):
         global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.eraserButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
         eraser = True
 
     def assignShapesMenu(self):
@@ -224,7 +228,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.uncheckAllButtons()
         self.shapesButton.setChecked(True)
 
-        self.setallFalse()
+        self.setAllFalse()
         if action.text() == "Line":
             drawingLines = True
         elif action.text() == "Rectangle":
@@ -240,7 +244,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
 
         imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
         # Load the image and resize it to fit the QGraphicsScene
@@ -251,27 +255,28 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, textboxContents
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
         insertingText = True
         textboxContents, ok = QInputDialog.getText(self, 'Text Box', 'Insert Text')
+
     def cloneStampClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.cloneStampButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
 
     def floodfillClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
 
     class SizeSlider(QWidget):
         def __init__(self, size, parent = None):
             super().__init__(parent)
             self.setGeometry(QRect(500, 300, 500, 200))
             layout = QVBoxLayout()
-            self.sizeTitle = QLabel("Pick size from 1 - 50\n(Click on the slider button again to confirm)")
+            self.sizeTitle = QLabel("Pick size from 1 - 50") #\n(Click on the slider button again to confirm)")
             self.sizeTitle.setAlignment(Qt.AlignCenter)
             layout.addWidget(self.sizeTitle)
                 
@@ -298,17 +303,12 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def sizeSliderClicked(self):
         global changedPenSize, drawingPenSize
-        if not changedPenSize:
-            self.uncheckAllButtons()
-            self.sizeSliderButton.setChecked(True)
-            size = self.scene.pen.width()
-            self.sizeSlider = self.SizeSlider(size)
-            self.sizeSlider.show()
-            changedPenSize = True
-        else:
-            self.scene.pen.setWidth(drawingPenSize)
-            self.scene.eraser.setWidth(drawingPenSize)
-            changedPenSize = False
+        self.setAllFalse()
+        self.uncheckAllButtons()
+        self.sizeSliderButton.setChecked(True)
+        self.sizeSlider = self.SizeSlider(self.scene.pen.width())
+        self.sizeSlider.show()
+        changedPenSize = True
 
     def colorPickerClicked(self):
         global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
@@ -316,7 +316,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         color = QColorDialog.getColor()
         self.scene.setPenColor(color)
         self.colorPickerButton.setChecked(True)
-        self.setallFalse()
+        self.setAllFalse()
 
     def uncheckAllButtons(self):
         self.mouseButton.setChecked(False)
@@ -329,9 +329,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.floodfillButton.setChecked(False)
         self.insertTextButton.setChecked(False)
 
-    def setallFalse(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
-        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingText = False
+    def setAllFalse(self):
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, changedPenSize
+        if changedPenSize:
+            self.scene.setPenSize(drawingPenSize)
+        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingText = changedPenSize = False
 
     def fileSave(self, saveAs=False):
         area = self.scene.sceneRect()
