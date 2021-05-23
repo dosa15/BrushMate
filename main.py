@@ -155,7 +155,7 @@ class GraphicsScene(QGraphicsScene):
 
     def setPenColor(self, color):
         self.pen.setColor(color)
-    
+
     def setPenSize(self, size):
         self.pen.setWidth(size)
         self.eraser.setWidth(size)
@@ -279,7 +279,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.sizeTitle = QLabel("Pick size from 1 - 50") #\n(Click on the slider button again to confirm)")
             self.sizeTitle.setAlignment(Qt.AlignCenter)
             layout.addWidget(self.sizeTitle)
-                
+
             self.sizePicker = QSlider(Qt.Horizontal)
             self.sizePicker.setRange(1, 50)
             self.sizePicker.setValue(size)
@@ -364,7 +364,66 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # filetype = QComboBox()
         # filetype.addItems([".jpg", ".jpeg", ".png"])
         # filetype.currentIndexChanged.connect(self.chooseFileType)
+        """
+    class Form(QWidget):
+        def __init__(self, parent = None):
+            QWidget.__init__(self, parent)
 
+            self.undoStack = QUndoStack()
+
+            undoAction = self.undoStack.createUndoAction(self, self.tr("&Undo"))
+            undoAction.setShortcuts(QKeySequence.Undo)
+            redoAction = self.undoStack.createRedoAction(self, self.tr("&Redo"))
+            redoAction.setShortcuts(QKeySequence.Redo)
+
+            nameEdit = QLineEdit()
+            addressEdit = QLineEdit()
+
+            undoButton = QToolButton()
+            undoButton.setDefaultAction(undoAction)
+            redoButton = QToolButton()
+            redoButton.setDefaultAction(redoAction)
+
+            nameEdit.editingFinished.connect(self.storeFieldText)
+            addressEdit.editingFinished.connect(self.storeFieldText)
+
+            formLayout = QFormLayout()
+            formLayout.addRow(self.tr("&Name"), nameEdit)
+            formLayout.addRow(self.tr("&Address"), addressEdit)
+
+            buttonLayout = QVBoxLayout()
+            buttonLayout.addWidget(undoButton)
+            buttonLayout.addWidget(redoButton)
+
+            layout = QHBoxLayout(self)
+            layout.addLayout(formLayout)
+            layout.addLayout(buttonLayout)
+
+            self.setWindowTitle(self.tr("Undo Example"))
+
+        def storeFieldText(self):
+            command = StoreCommand(self.sender())
+            self.undoStack.push(command)
+
+    class StoreCommand(QUndoCommand):
+        def __init__(self, field):
+            QUndoCommand.__init__(self)
+            # Record the field that has changed.
+            self.field = field
+
+            # Record the text at the time the command was created.
+            self.text = field.text()
+
+        def undo(self):
+            # Remove the text from the file and set it in the field.
+            # ...
+            self.field.setText(self.text)
+
+        def redo(self):
+            # Store the text in the file and set it in the field.
+            # ...
+            self.field.setText(self.text)
+        """
 if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
