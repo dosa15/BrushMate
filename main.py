@@ -364,8 +364,50 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # filetype = QComboBox()
         # filetype.addItems([".jpg", ".jpeg", ".png"])
         # filetype.currentIndexChanged.connect(self.chooseFileType)
-        
+        '''
+    def fill_mousePressEvent(self, e):
 
+        if e.button() == Qt.LeftButton:
+            self.active_color = self.primary_color
+        else:
+            self.active_color = self.secondary_color
+
+        image = self.pixmap().toImage()
+        w, h = image.width(), image.height()
+        x, y = e.x(), e.y()
+
+        # Get our target color from origin.
+        target_color = image.pixel(x,y)
+
+        have_seen = set()
+        queue = [(x, y)]
+
+        def get_cardinal_points(have_seen, center_pos):
+            points = []
+            cx, cy = center_pos
+            for x, y in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+                xx, yy = cx + x, cy + y
+                if (xx >= 0 and xx < w and
+                    yy >= 0 and yy < h and
+                    (xx, yy) not in have_seen):
+
+                    points.append((xx, yy))
+                    have_seen.add((xx, yy))
+
+            return points
+
+        # Now perform the search and fill.
+        p = QPainter(self.pixmap())
+        p.setPen(QPen(self.active_color))
+
+        while queue:
+            x, y = queue.pop()
+            if image.pixel(x, y) == target_color:
+                p.drawPoint(QPoint(x, y))
+                queue.extend(get_cardinal_points(have_seen, (x, y)))
+
+        self.update()
+        '''
 if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
