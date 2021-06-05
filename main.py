@@ -261,7 +261,6 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.clicked.connect(self.insertTextClicked)
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
-        self.insertImgButton.clicked.connect(self.insertImgClicked)
         self.sizeSliderButton.clicked.connect(self.sizeSliderClicked)
         self.colorPickerButton.clicked.connect(self.colorPickerClicked)
 
@@ -323,6 +322,39 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         elif action.text() == "Ellipse":
             drawingEllipses = True
 
+    class MovableImage(QGraphicsPixmapItem):
+
+        def __init__(self, QPixmap, parent=None):
+            super().__init__(QPixmap, parent=parent)
+            self.setPos(100, 100)
+            self.setAcceptHoverEvents(True)
+            # self.group = QGraphicsItemGroup(scene=parent.scene)
+            # self.group.setHandlesChildEvents(False)
+
+        def hoverEnterEvent(self, QGraphicsSceneHoverEvent):
+            self.setCursor(Qt.OpenHandCursor)
+            return super().hoverEnterEvent(self, QGraphicsSceneHoverEvent)
+
+        def hoverLeaveEvent(self, QGraphicsSceneHoverEvent):
+            self.cursor(Qt.CrossCursor)
+            return super().hoverLeaveEvent(self, QGraphicsSceneHoverEvent)
+
+        def mousePressEvent(self, QGraphicsSceneMouseEvent):
+            return super().mousePressEvent(self, QGraphicsSceneMouseEvent)
+
+        def mouseMoveEvent(self, QGraphicsSceneMouseEvent):
+            startPos = QGraphicsSceneMouseEvent.lastScenePos()
+            updatedPos = QGraphicsSceneMouseEvent.scenePos()
+            currentPos = self.scenePos()
+            updatedX = updatedPos.x() - startPos.x() + currentPos.x()
+            updatedY = updatedPos.y() - startPos.y() + currentPos.y()
+            self.setPos(updatedX, updatedY)
+            return super().mouseMoveEvent(self, QGraphicsSceneMouseEvent)
+
+        def mouseReleaseEvent(self, QGraphicsSceneMouseEvent):
+            return super().mouseReleaseEvent(self, QGraphicsSceneMouseEvent)
+
+
     def insertImgClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
         self.uncheckAllButtons()
@@ -331,8 +363,10 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
         # Load the image and resize it to fit the QGraphicsScene
-        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(self.scene.width()), int(self.scene.height()), aspectRatioMode=Qt.KeepAspectRatio))
-        self.scene.addPixmap(image)
+        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(100), int(100), aspectRatioMode=Qt.IgnoreAspectRatio))
+        imageItem = self.MovableImage(image)
+        self.scene.addItem(imageItem)
+        self.insertImgButton.setChecked(False)
 
     def insertTextClicked(self):
         global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, textboxContents, floodFill
