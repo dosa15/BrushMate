@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from numba import njit
 import sys, random
 
 freeHand = False
@@ -17,6 +18,7 @@ drawingEllipses = False
 drawingPenSize = 1
 changedPenSize = False
 insertingText = False
+floodFill = False
 textboxContents = ""
 
 class GraphicsScene(QGraphicsScene):
@@ -26,7 +28,8 @@ class GraphicsScene(QGraphicsScene):
         self.setSceneRect(0, 0, 660, 680)
         self.setAllFirstClicksTrue()
         self.start = self.end = QPointF(-1, -1)
-        self.pen = QPen(Qt.black)
+        self.color = Qt.black
+        self.pen = QPen(self.color)
         self.pen.setCapStyle(Qt.RoundCap)
         self.eraser = QPen(Qt.color0, 25) # Color0 is automatically set as the color of the background
         self.eraser.setCapStyle(Qt.RoundCap)
@@ -39,8 +42,9 @@ class GraphicsScene(QGraphicsScene):
         self.firstClickEllipse = True
         self.firstClickText = True
 
+    # @njit(nopython=True)
     def mousePressEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, floodFill
 
         if freeHand:
             freeHandDraw = True
@@ -126,6 +130,47 @@ class GraphicsScene(QGraphicsScene):
             self.addText(textboxContents).setPos(event.scenePos())
             #textBox.setPos(event.scenePos().x, event.scenePos.y)
             #textItem.setPos(self.start)
+        elif floodFill:
+            self.start = event.scenePos()
+
+            paintDevice = QPixmap(int(self.sceneRect().width()), int(self.sceneRect().height()))
+            painter = QPainter(paintDevice)
+            self.render(painter)
+            pixelMap = paintDevice.toImage()
+
+            buffer = []
+            buffer.append([self.start.x(), self.start.y()])
+        
+            bgColor = pixelMap.pixelColor(int(self.start.x()), int(self.start.y()))
+            try:    
+                pixelMap.setPixelColor(int(self.start.x()), int(self.start.y()), self.color)
+            
+                while len(buffer) > 0:
+                    
+                    currentPixel = buffer.pop()
+                    # print(currPixel)
+                    currentX = currentPixel[0]
+                    currentY = currentPixel[1]
+                    
+                    if self.canFlood(pixelMap, currentX + 1, currentY, bgColor, self.color):
+                        pixelMap.setPixelColor(int(currentX + 1), int(currentY), self.color)
+                        buffer.append([int(currentX + 1), int(currentY)])
+                    
+                    if self.canFlood(pixelMap, currentX, currentY + 1, bgColor, self.color):
+                        pixelMap.setPixelColor(int(currentX), int(currentY + 1), self.color)
+                        buffer.append([int(currentX), int(currentY + 1)])
+
+                    if self.canFlood(pixelMap, currentX-1, currentY, bgColor, self.color):
+                        pixelMap.setPixelColor(int(currentX-1), int(currentY), self.color)
+                        buffer.append([int(currentX - 1), int(currentY)])
+                    
+                    if self.canFlood(pixelMap, currentX, currentY-1, bgColor, self.color):
+                        pixelMap.setPixelColor(int(currentX), int(currentY-1), self.color)
+                        buffer.append([int(currentX), int(currentY - 1)])
+                self.addPixmap(QPixmap(pixelMap))
+            except:
+                print(bgColor)
+            painter.end()
 
         else:
             self.setAllFirstClicksTrue()
@@ -154,11 +199,17 @@ class GraphicsScene(QGraphicsScene):
             eraserDraw = False
 
     def setPenColor(self, color):
+        self.color = color
         self.pen.setColor(color)
 
     def setPenSize(self, size):
         self.pen.setWidth(size)
         self.eraser.setWidth(size)
+    
+    def canFlood(self, pixelMap, x, y, bgColor, fillColor):
+        if x < 0 or x >= self.width() or y < 0 or y >= self.height() or pixelMap.pixelColor(int(x), int(y))!= bgColor or pixelMap.pixelColor(int(x), int(y)) == fillColor:
+                return False
+        return True
 
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
@@ -252,7 +303,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.scene.addPixmap(image)
 
     def insertTextClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, textboxContents
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, textboxContents, floodFill
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
         self.setAllFalse()
@@ -260,16 +311,18 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         textboxContents, ok = QInputDialog.getText(self, 'Text Box', 'Insert Text')
 
     def cloneStampClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, floodFill
         self.uncheckAllButtons()
         self.cloneStampButton.setChecked(True)
         self.setAllFalse()
 
     def floodfillClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, floodFill
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setAllFalse()
+        floodFill = True
+        
 
     class SizeSlider(QWidget):
         def __init__(self, size, parent = None):
@@ -330,10 +383,10 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.setChecked(False)
 
     def setAllFalse(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, changedPenSize
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, changedPenSize, floodFill
         if changedPenSize:
             self.scene.setPenSize(drawingPenSize)
-        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingText = changedPenSize = False
+        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingText = changedPenSize = floodFill = False
 
     def fileSave(self, saveAs=False):
         area = self.scene.sceneRect()
