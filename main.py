@@ -261,6 +261,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.clicked.connect(self.insertTextClicked)
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
+        self.mouseCursor.clicked.connect(self.mouseCursorClicked)
         self.sizeSliderButton.clicked.connect(self.sizeSliderClicked)
         self.colorPickerButton.clicked.connect(self.colorPickerClicked)
 
@@ -405,6 +406,13 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         def mouseMoveEvent(self, event):
             self.label.setText('Mouse coords: ( %d : %d )' % (event.x(), event.y()))
+    
+    def mouseCursorClicked(self):
+        self.setAllFalse()
+        self.uncheckAllButtons()
+        self.mouseCursor.setChecked(True)
+        self.mouseTracker = self.MouseTracker()
+        self.mouseTracker.show()
 
     class SizeSlider(QWidget):
         def __init__(self, size, parent = None):
