@@ -17,6 +17,10 @@ drawingCircles = False
 drawingEllipses = False
 drawingPenSize = 1
 changedPenSize = False
+insertingImg = False
+moveImg = False
+movingImg = False
+imageToMove = None
 insertingText = False
 floodFill = False
 textboxContents = ""
@@ -48,9 +52,22 @@ class GraphicsScene(QGraphicsScene):
 
     # @njit(nopython=True)
     def mousePressEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, floodFill
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, movingImg, imageToMove, insertingText, floodFill
 
-        if freeHand:
+        if moveImg and imageToMove is not None:
+            # self.setCursor(Qt.ArrowCursor)
+            imgBounds = imageToMove.boundingRect().getCoords()
+            x1, y1, x2, y2 = imgBounds
+            currentPos = event.scenePos()
+            if currentPos.x() > x1 and currentPos.x() < x2 and currentPos.y() > y1 and currentPos.y() < y2:
+                if currentPos.x() < x1+10 and currentPos.x() > x2-10 and currentPos.y() < y1+10 and currentPos.y() > y2-10:
+                    scaleImg = True
+                else:
+                    movingImg = True
+                self.start = event.scenePos()
+                # self.setCursor(Qt.OpenHandCursor)
+        
+        elif freeHand:
             freeHandDraw = True
             self.start = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.start.x(), self.start.y(), pen=self.pen)
@@ -81,7 +98,6 @@ class GraphicsScene(QGraphicsScene):
                     self.start.y,self.end.y=self.end.y,self.start.y
                 self.addRect(QRectF(QPointF(self.start.x(), self.start.y()),QPointF(self.end.x(), self.end.y())), pen=self.pen)
                 self.firstClickRect = True
-
 
         elif drawingSquares:
             if self.firstClickSquare:
@@ -209,7 +225,13 @@ class GraphicsScene(QGraphicsScene):
 
 
     def mouseMoveEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, movingImg, imageToMove, insertingText, floodFill
+
+        if movingImg:
+            self.end = event.scenePos()
+            transformation = QTransform()
+            transformation.translate(self.end.x() - self.start.x(), self.end.y() - self.start.y())
+            imageToMove.setTransform(transformation)
 
         if freeHandDraw:
             self.end = event.scenePos()
@@ -220,15 +242,69 @@ class GraphicsScene(QGraphicsScene):
             self.end = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.eraser)
             self.start = self.end
+        
 
     def mouseReleaseEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, movingImg, imageToMove, insertingText, floodFill
+
+        if movingImg:
+            # transformation = QTransform()
+            # transformation.translate(self.end.x() - self.start.x(), self.end.y() - self.start.y())
+            # imageToMove.setTransform(transformation)
+            # imageToMove.setPos(imageToMove.scenePos())
+            print(imageToMove)
+            print(self.start, self.end)
+            # self.setCursor(Qt.CrossCursor)
+            movingImg = False
 
         if freeHandDraw:
             freeHandDraw = False
 
         if eraserDraw:
             eraserDraw = False
+
+    # class MovableImage(QGraphicsPixmapItem):
+
+    #     def __init__(self, QPixmap, parent=None):
+    #         super().__init__(QPixmap, parent=parent)
+    #         self.setPos(100, 100)
+    #         self.setAcceptHoverEvents(True)
+    #         # self.group = QGraphicsItemGroup(scene=parent.scene)
+    #         # self.group.setHandlesChildEvents(False)
+
+    #     def hoverEnterEvent(self, event):
+    #         self.setCursor(Qt.OpenHandCursor)
+    #         super().hoverEnterEvent(event)
+
+    #     def hoverLeaveEvent(self, event):
+    #         self.setCursor(Qt.CrossCursor)
+    #         super().hoverLeaveEvent(event)
+
+    #     def mousePressEvent(self, event):
+    #         print("works")
+    #         super().mousePressEvent(event)
+
+    #     def mouseMoveEvent(self, event):
+    #         startPos = event.lastScenePos()
+    #         updatedPos = event.scenePos()
+    #         currentPos = self.scenePos()
+    #         updatedX = updatedPos.x() - startPos.x() + currentPos.x()
+    #         updatedY = updatedPos.y() - startPos.y() + currentPos.y()
+    #         self.setPos(updatedX, updatedY)
+    #         super().mouseMoveEvent(event)
+
+    #     def mouseReleaseEvent(self, event):
+    #         print("also works")
+    #         super().mouseReleaseEvent(event)
+
+    def insertNewImage(self):
+        global imageToMove
+        imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
+        # Load the image and resize it to fit the QGraphicsScene
+        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(100), int(100), aspectRatioMode=Qt.IgnoreAspectRatio))
+        imageItem = QGraphicsPixmapItem(image)
+        imageToMove = imageItem
+        self.addItem(imageItem)
 
     def setPenColor(self, color):
         self.color = color
@@ -243,6 +319,8 @@ class GraphicsScene(QGraphicsScene):
                 return False
         return True
 
+
+
 class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None):
@@ -252,6 +330,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.scene.setBackgroundBrush(QBrush(Qt.white))
         self.graphicsView.setScene(self.scene)
         self.graphicsView.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.graphicsView.setInteractive(True)
         self.mouseButton.setChecked(True)
         self.mouseButton.clicked.connect(self.mouseClicked)
         self.freehandButton.clicked.connect(self.freehandClicked)
@@ -280,10 +359,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave_As.setShortcut(_translate("Ui_MainWindow", "Ctrl+Shift+S"))
 
     def mouseClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, moveImg
         self.uncheckAllButtons()
         self.mouseButton.setChecked(True)
         self.setAllFalse()
+        moveImg = True
 
     def freehandClicked(self):
         global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
@@ -323,54 +403,16 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         elif action.text() == "Ellipse":
             drawingEllipses = True
 
-    class MovableImage(QGraphicsPixmapItem):
-
-        def __init__(self, QPixmap, parent=None):
-            super().__init__(QPixmap, parent=parent)
-            self.setPos(100, 100)
-            self.setAcceptHoverEvents(True)
-            # self.group = QGraphicsItemGroup(scene=parent.scene)
-            # self.group.setHandlesChildEvents(False)
-
-        def hoverEnterEvent(self, QGraphicsSceneHoverEvent):
-            self.setCursor(Qt.OpenHandCursor)
-            return super().hoverEnterEvent(self, QGraphicsSceneHoverEvent)
-
-        def hoverLeaveEvent(self, QGraphicsSceneHoverEvent):
-            self.cursor(Qt.CrossCursor)
-            return super().hoverLeaveEvent(self, QGraphicsSceneHoverEvent)
-
-        def mousePressEvent(self, QGraphicsSceneMouseEvent):
-            return super().mousePressEvent(self, QGraphicsSceneMouseEvent)
-
-        def mouseMoveEvent(self, QGraphicsSceneMouseEvent):
-            startPos = QGraphicsSceneMouseEvent.lastScenePos()
-            updatedPos = QGraphicsSceneMouseEvent.scenePos()
-            currentPos = self.scenePos()
-            updatedX = updatedPos.x() - startPos.x() + currentPos.x()
-            updatedY = updatedPos.y() - startPos.y() + currentPos.y()
-            self.setPos(updatedX, updatedY)
-            return super().mouseMoveEvent(self, QGraphicsSceneMouseEvent)
-
-        def mouseReleaseEvent(self, QGraphicsSceneMouseEvent):
-            return super().mouseReleaseEvent(self, QGraphicsSceneMouseEvent)
-
-
     def insertImgClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
         self.uncheckAllButtons()
         self.insertImgButton.setChecked(True)
         self.setAllFalse()
-
-        imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
-        # Load the image and resize it to fit the QGraphicsScene
-        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(100), int(100), aspectRatioMode=Qt.IgnoreAspectRatio))
-        imageItem = self.MovableImage(image)
-        self.scene.addItem(imageItem)
+        self.scene.insertNewImage()
         self.insertImgButton.setChecked(False)
 
     def insertTextClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, textboxContents, floodFill
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
         self.setAllFalse()
@@ -378,14 +420,14 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         textboxContents, ok = QInputDialog.getText(self, 'Text Box', 'Insert Text')
 
     def cloneStampClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, floodFill, cloneStamping
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
         self.uncheckAllButtons()
         self.cloneStampButton.setChecked(True)
         self.setAllFalse()
         cloneStamping = True
 
     def floodfillClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, floodFill
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
         self.uncheckAllButtons()
         self.floodfillButton.setChecked(True)
         self.setAllFalse()
@@ -454,7 +496,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         changedPenSize = True
 
     def colorPickerClicked(self):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
         self.uncheckAllButtons()
         color = QColorDialog.getColor()
         self.scene.setPenColor(color)
@@ -473,10 +515,10 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.setChecked(False)
 
     def setAllFalse(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, changedPenSize, floodFill, cloneStamping
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, insertingText, changedPenSize, floodFill, cloneStamping
         if changedPenSize:
             self.scene.setPenSize(drawingPenSize)
-        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingText = changedPenSize = floodFill = False
+        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingImg = moveImg = insertingText = changedPenSize = floodFill = False
 
     def fileSave(self, saveAs=False):
         area = self.scene.sceneRect()
