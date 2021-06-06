@@ -340,7 +340,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.clicked.connect(self.insertTextClicked)
         self.cloneStampButton.clicked.connect(self.cloneStampClicked)
         self.floodfillButton.clicked.connect(self.floodfillClicked)
-        self.mouseCursor.clicked.connect(self.mouseCursorClicked)
+        # self.mouseCursor.clicked.connect(self.mouseCursorClicked)
         self.sizeSliderButton.clicked.connect(self.sizeSliderClicked)
         self.colorPickerButton.clicked.connect(self.colorPickerClicked)
 
