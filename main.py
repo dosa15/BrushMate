@@ -149,8 +149,14 @@ class GraphicsScene(QGraphicsScene):
                 self.firstClickEllipse = True
 
         elif insertingText:
-            global textboxContents
-            self.addText(textboxContents).setPos(event.scenePos())
+            global textboxContents, drawingPenSize
+            textBox = QGraphicsTextItem(textboxContents)
+            textBox.setPos(event.scenePos())
+            textBox.setDefaultTextColor(self.color)
+            textFont = QFont()
+            textFont.setPointSize(drawingPenSize)
+            textBox.setFont(textFont)
+            self.addItem(textBox)
             #textBox.setPos(event.scenePos().x, event.scenePos.y)
             #textItem.setPos(self.start)
 
@@ -314,7 +320,7 @@ class GraphicsScene(QGraphicsScene):
         global imageToTransform
         imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
         # Load the image and resize it to fit the QGraphicsScene
-        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(100), int(100), aspectRatioMode=Qt.IgnoreAspectRatio))
+        image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(200), int(200), aspectRatioMode=Qt.IgnoreAspectRatio))
         imageItem = QGraphicsPixmapItem(image)
         imageToTransform = imageItem
         self.addItem(imageItem)

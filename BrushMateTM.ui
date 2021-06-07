@@ -60,7 +60,7 @@
       <x>11</x>
       <y>11</y>
       <width>751</width>
-      <height>72</height>
+      <height>88</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="Title" stretch="0,0,0,0">
@@ -109,8 +109,8 @@
        </property>
        <property name="font">
         <font>
-         <family>Cambria</family>
-         <pointsize>36</pointsize>
+         <family>Marker Felt</family>
+         <pointsize>64</pointsize>
          <italic>true</italic>
         </font>
        </property>
@@ -148,7 +148,7 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>81</width>
+      <width>85</width>
       <height>671</height>
      </rect>
     </property>
@@ -720,7 +720,7 @@
      <x>0</x>
      <y>0</y>
      <width>790</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
