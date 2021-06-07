@@ -18,9 +18,12 @@ drawingEllipses = False
 drawingPenSize = 1
 changedPenSize = False
 insertingImg = False
-moveImg = False
+transformImg = False
 movingImg = False
-imageToMove = None
+translationFactor = [0, 0]
+scalingImg = False
+scaleFactor = [1, 1]
+imageToTransform = None
 insertingText = False
 floodFill = False
 textboxContents = ""
@@ -52,20 +55,19 @@ class GraphicsScene(QGraphicsScene):
 
     # @njit(nopython=True)
     def mousePressEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, movingImg, imageToMove, insertingText, floodFill
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, transformImg, movingImg, scalingImg, imageToTransform, insertingText, floodFill
 
-        if moveImg and imageToMove is not None:
+        if transformImg and imageToTransform is not None:
             # self.setCursor(Qt.ArrowCursor)
-            imgBounds = imageToMove.boundingRect().getCoords()
+            imgBounds = imageToTransform.boundingRect().getCoords()
             x1, y1, x2, y2 = imgBounds
             currentPos = event.scenePos()
-            if currentPos.x() > x1 and currentPos.x() < x2 and currentPos.y() > y1 and currentPos.y() < y2:
-                if currentPos.x() < x1+10 and currentPos.x() > x2-10 and currentPos.y() < y1+10 and currentPos.y() > y2-10:
-                    scaleImg = True
-                else:
-                    movingImg = True
-                self.start = event.scenePos()
-                # self.setCursor(Qt.OpenHandCursor)
+            if currentPos.x() in range(int(x1), int(x1+20)) or currentPos.x() in range(int(x2-20), int(x2)) and currentPos.y() in range(int(y1), int(y1+20)) or currentPos.y() in range(int(y2-20), int(y2)):
+                scalingImg = True
+            elif currentPos.x() in range(int(x1), int(x2)) and currentPos.y() in range(int(y1), int(y2)):
+                movingImg = True
+            self.start = event.scenePos()
+            # self.setCursor(Qt.OpenHandCursor)
         
         elif freeHand:
             freeHandDraw = True
@@ -225,13 +227,21 @@ class GraphicsScene(QGraphicsScene):
 
 
     def mouseMoveEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, movingImg, imageToMove, insertingText, floodFill
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, transformImg, translationFactor, movingImg, imageToTransform, insertingText, floodFill
 
         if movingImg:
             self.end = event.scenePos()
             transformation = QTransform()
             transformation.translate(self.end.x() - self.start.x(), self.end.y() - self.start.y())
-            imageToMove.setTransform(transformation)
+            imageToTransform.setTransform(transformation)
+
+        if scalingImg:
+            self.end = event.scenePos()
+            transformation = QTransform()
+            # x1, y1, x2, y2 = imageToTransform.boundingRect().getCoords()
+            scaleFactor[0]
+            transformation.scale((self.end.x())/(self.start.x()), (self.end.y())/(self.start.y()))
+            imageToTransform.setTransform(transformation)
 
         if freeHandDraw:
             self.end = event.scenePos()
@@ -245,17 +255,20 @@ class GraphicsScene(QGraphicsScene):
         
 
     def mouseReleaseEvent(self, event):
-        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, movingImg, imageToMove, insertingText, floodFill
+        global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, transformImg, movingImg, scalingImg, imageToTransform, insertingText, floodFill
 
         if movingImg:
             # transformation = QTransform()
             # transformation.translate(self.end.x() - self.start.x(), self.end.y() - self.start.y())
             # imageToMove.setTransform(transformation)
             # imageToMove.setPos(imageToMove.scenePos())
-            print(imageToMove)
+            print(imageToTransform)
             print(self.start, self.end)
             # self.setCursor(Qt.CrossCursor)
             movingImg = False
+
+        if scalingImg:
+            scalingImg = False
 
         if freeHandDraw:
             freeHandDraw = False
@@ -298,12 +311,12 @@ class GraphicsScene(QGraphicsScene):
     #         super().mouseReleaseEvent(event)
 
     def insertNewImage(self):
-        global imageToMove
+        global imageToTransform
         imagePath = QFileDialog.getOpenFileName(caption="Open File", directory="",filter="Images (*.jpg *.jpeg *.png)")
         # Load the image and resize it to fit the QGraphicsScene
         image = QPixmap.fromImage(QImage(imagePath[0]).scaled(int(100), int(100), aspectRatioMode=Qt.IgnoreAspectRatio))
         imageItem = QGraphicsPixmapItem(image)
-        imageToMove = imageItem
+        imageToTransform = imageItem
         self.addItem(imageItem)
 
     def setPenColor(self, color):
@@ -316,7 +329,7 @@ class GraphicsScene(QGraphicsScene):
 
     def canFlood(self, pixelMap, x, y, bgColor, fillColor):
         if x < 0 or x >= self.width() or y < 0 or y >= self.height() or pixelMap.pixelColor(int(x), int(y))!= bgColor or pixelMap.pixelColor(int(x), int(y)) == fillColor:
-                return False
+            return False
         return True
 
 
@@ -359,11 +372,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave_As.setShortcut(_translate("Ui_MainWindow", "Ctrl+Shift+S"))
 
     def mouseClicked(self):
-        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, moveImg
+        global freeHand, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText, transformImg
         self.uncheckAllButtons()
         self.mouseButton.setChecked(True)
         self.setAllFalse()
-        moveImg = True
+        transformImg = True
 
     def freehandClicked(self):
         global freeHand, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingText
@@ -513,10 +526,10 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertTextButton.setChecked(False)
 
     def setAllFalse(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, moveImg, insertingText, changedPenSize, floodFill, cloneStamping
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, transformImg, insertingText, changedPenSize, floodFill, cloneStamping
         if changedPenSize:
             self.scene.setPenSize(drawingPenSize)
-        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingImg = moveImg = insertingText = changedPenSize = floodFill = False
+        freeHand = eraser = drawingLines = drawingRects = drawingSquares = drawingCircles = drawingEllipses = insertingImg = transformImg = insertingText = changedPenSize = floodFill = False
 
     def fileSave(self, saveAs=False):
         area = self.scene.sceneRect()
