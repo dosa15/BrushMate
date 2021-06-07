@@ -68,7 +68,7 @@ class GraphicsScene(QGraphicsScene):
                 movingImg = True
             self.start = event.scenePos()
             # self.setCursor(Qt.OpenHandCursor)
-        
+
         elif freeHand:
             freeHandDraw = True
             self.start = event.scenePos()
@@ -252,7 +252,7 @@ class GraphicsScene(QGraphicsScene):
             self.end = event.scenePos()
             self.addLine(self.start.x(), self.start.y(), self.end.x(), self.end.y(), pen=self.eraser)
             self.start = self.end
-        
+
 
     def mouseReleaseEvent(self, event):
         global freeHand, freeHandDraw, eraser, eraserDraw, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, transformImg, movingImg, scalingImg, imageToTransform, insertingText, floodFill
@@ -425,7 +425,7 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.insertImgButton.setChecked(False)
 
     def insertTextClicked(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
+        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping, textboxContents
         self.uncheckAllButtons()
         self.insertTextButton.setChecked(True)
         self.setAllFalse()
