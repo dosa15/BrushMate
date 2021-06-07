@@ -60,7 +60,7 @@
       <x>11</x>
       <y>11</y>
       <width>751</width>
-      <height>88</height>
+      <height>71</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="Title" stretch="0,0,0,0">
@@ -148,7 +148,7 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>85</width>
+      <width>71</width>
       <height>671</height>
      </rect>
     </property>
