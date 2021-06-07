@@ -28,7 +28,8 @@ insertingText = False
 floodFill = False
 textboxContents = ""
 cloneStamping = False
-
+textColor = Qt.black
+textSize = 10
 
 class GraphicsScene(QGraphicsScene):
 
@@ -326,13 +327,16 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(imageItem)
 
     def setPenColor(self, color):
+        global textColor
         self.color = color
         self.pen.setColor(color)
+        textColor = color
 
     def setPenSize(self, size):
+        global textSize
         self.pen.setWidth(size)
         self.eraser.setWidth(size)
-
+        textSize = size
     def canFlood(self, pixelMap, x, y, bgColor, fillColor):
         if x < 0 or x >= self.width() or y < 0 or y >= self.height() or pixelMap.pixelColor(int(x), int(y))!= bgColor or pixelMap.pixelColor(int(x), int(y)) == fillColor:
             return False
@@ -513,10 +517,11 @@ class BrushMateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         changedPenSize = True
 
     def colorPickerClicked(self):
-        global freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
+        global textColor,freeHand, freeHandDraw, eraser, drawingLines, drawingRects, drawingSquares, drawingCircles, drawingEllipses, insertingImg, insertingText, changedPenSize, floodFill, cloneStamping
         self.uncheckAllButtons()
         color = QColorDialog.getColor()
         self.scene.setPenColor(color)
+        textColor = color
         self.colorPickerButton.setChecked(True)
         self.setAllFalse()
 
